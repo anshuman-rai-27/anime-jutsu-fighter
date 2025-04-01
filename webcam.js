@@ -1,459 +1,78 @@
-// let detector;
-// let detectorConfig;
-// let poses;
-// let video;
-// let skeleton = true;
-// let model;
-// let elbowAngle = 999;
-// let backAngle = 0;
-// let reps = 0;
-// let upPosition = false;
-// let downPosition = false;
-// let highlightBack = false;
-// let backWarningGiven = false;
-
-
-// async function init() {
-//   detectorConfig = { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER };
-//   detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
-//   edges = {
-//     '5,7': 'm',
-//     '7,9': 'm',
-//     '6,8': 'c',
-//     '8,10': 'c',
-//     '5,6': 'y',
-//     '5,11': 'm',
-//     '6,12': 'c',
-//     '11,12': 'y',
-//     '11,13': 'm',
-//     '13,15': 'm',
-//     '12,14': 'c',
-//     '14,16': 'c'
-//   };
-//   await getPoses();
-// }
-
-// async function videoReady() {
-//   //console.log('video ready');
-// }
-
-// async function setup() {
-//   var msg = new SpeechSynthesisUtterance('Loading, please wait...');
-//   window.speechSynthesis.speak(msg);
-//   createCanvas(640, 480);
-//   video = createCapture(VIDEO, videoReady);
-//   //video.size(960, 720);
-//   video.hide()
-
-//   await init();
-// }
-
-// async function getPoses() {
-//   poses = await detector.estimatePoses(video.elt);
-//   setTimeout(getPoses, 0);
-//   //console.log(poses);
-// }
-
-// function draw() {
-//   background(220);
-//   translate(width, 0);
-//   scale(-1, 1);
-//   image(video, 0, 0, video.width, video.height);
-
-//   // Draw keypoints and skeleton
-//   drawKeypoints();
-//   if (skeleton) {
-//     drawSkeleton();
-//   }
-
-//   // Write text
-//   fill(255);
-//   strokeWeight(2);
-//   stroke(51);
-//   translate(width, 0);
-//   scale(-1, 1);
-//   textSize(40);
-
-//   if (poses && poses.length > 0) {
-//     let pushupString = `Push-ups completed: ${reps}`;
-//     text(pushupString, 100, 90);
-//   }
-//   else {
-//     text('Loading, please wait...', 100, 90);
-//   }
-  
-// }
-
-// function drawKeypoints() {
-//   var count = 0;
-//   if (poses && poses.length > 0) {
-//     for (let kp of poses[0].keypoints) {
-//       const { x, y, score } = kp;
-//       if (score > 0.3) {
-//         count = count + 1;
-//         fill(255);
-//         stroke(0);
-//         strokeWeight(4);
-//         circle(x, y, 16);
-//       }
-//       if (count == 17) {
-//         //console.log('Whole body visible!');
-//       }
-//       else {
-//         //console.log('Not fully visible!');
-//       }
-//       updateArmAngle();
-//       updateBackAngle();
-//       inUpPosition();
-//       inDownPosition();
-//     }
-//   }
-// }
-
-// // Draws lines between the keypoints
-// function drawSkeleton() {
-//   confidence_threshold = 0.5;
-
-//   if (poses && poses.length > 0) {
-//     for (const [key, value] of Object.entries(edges)) {
-//       const p = key.split(",");
-//       const p1 = p[0];
-//       const p2 = p[1];
-
-//       const y1 = poses[0].keypoints[p1].y;
-//       const x1 = poses[0].keypoints[p1].x;
-//       const c1 = poses[0].keypoints[p1].score;
-//       const y2 = poses[0].keypoints[p2].y;
-//       const x2 = poses[0].keypoints[p2].x;
-//       const c2 = poses[0].keypoints[p2].score;
-
-//       if ((c1 > confidence_threshold) && (c2 > confidence_threshold)) {
-//         if ((highlightBack == true) && ((p[1] == 11) || ((p[0] == 6) && (p[1] == 12)) || (p[1] == 13) || (p[0] == 12))) {
-//           strokeWeight(3);
-//           stroke(255, 0, 0);
-//           line(x1, y1, x2, y2);
-//         }
-//         else {
-//           strokeWeight(2);
-//           stroke('rgb(0, 255, 0)');
-//           line(x1, y1, x2, y2);
-//         }
-//       }
-//     }
-//   }
-// }
-
-// function updateArmAngle() {
-//   /*
-//   rightWrist = poses[0].keypoints[10];
-//   rightShoulder = poses[0].keypoints[6];
-//   rightElbow = poses[0].keypoints[8];
-//   */
-//   leftWrist = poses[0].keypoints[9];
-//   leftShoulder = poses[0].keypoints[5];
-//   leftElbow = poses[0].keypoints[7];
-
-
-
-//   angle = (
-//     Math.atan2(
-//       leftWrist.y - leftElbow.y,
-//       leftWrist.x - leftElbow.x
-//     ) - Math.atan2(
-//       leftShoulder.y - leftElbow.y,
-//       leftShoulder.x - leftElbow.x
-//     )
-//   ) * (180 / Math.PI);
-
-//   if (angle < 0) {
-//     //angle = angle + 360;
-//   }
-
-//   if (leftWrist.score > 0.3 && leftElbow.score > 0.3 && leftShoulder.score > 0.3) {
-//     //console.log(angle);
-//     elbowAngle = angle;
-//   }
-//   else {
-//     //console.log('Cannot see elbow');
-//   }
-
-// }
-
-// function updateBackAngle() {
-
-//   var leftShoulder = poses[0].keypoints[5];
-//   var leftHip = poses[0].keypoints[11];
-//   var leftKnee = poses[0].keypoints[13];
-
-//   angle = (
-//     Math.atan2(
-//       leftKnee.y - leftHip.y,
-//       leftKnee.x - leftHip.x
-//     ) - Math.atan2(
-//       leftShoulder.y - leftHip.y,
-//       leftShoulder.x - leftHip.x
-//     )
-//   ) * (180 / Math.PI);
-//   angle = angle % 180;
-//   if (leftKnee.score > 0.3 && leftHip.score > 0.3 && leftShoulder.score > 0.3) {
-
-//     backAngle = angle;
-//   }
-
-//   if ((backAngle < 20) || (backAngle > 160)) {
-//     highlightBack = false;
-//   }
-//   else {
-//     highlightBack = true;
-//     if (backWarningGiven != true) {
-//       var msg = new SpeechSynthesisUtterance('Keep your back straight');
-//       window.speechSynthesis.speak(msg);
-//       backWarningGiven = true;
-//     }
-//   }
-
-// }
-
-// function inUpPosition() {
-//   if (elbowAngle > 170 && elbowAngle < 200) {
-//     //console.log('In up position')
-//     if (downPosition == true) {
-//       var msg = new SpeechSynthesisUtterance(str(reps+1));
-//       window.speechSynthesis.speak(msg);
-//       reps = reps + 1;
-//     }
-//     upPosition = true;
-//     downPosition = false;
-//   }
-// }
-
-// function inDownPosition() {
-//   var elbowAboveNose = false;
-//   if (poses[0].keypoints[0].y > poses[0].keypoints[7].y) {
-//     elbowAboveNose = true;
-//   }
-//   else {
-//     //console.log('Elbow is not above nose')
-//   }
-
-//   if ((highlightBack == false) && elbowAboveNose && ((abs(elbowAngle) > 70) && (abs(elbowAngle) < 100))) {
-//     //console.log('In down position')
-//     if (upPosition == true) {
-//       var msg = new SpeechSynthesisUtterance('Up');
-//       window.speechSynthesis.speak(msg);
-//     }
-//     downPosition = true;
-//     upPosition = false;
-//   }
-// }
-
-//////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-// // Global variables
-// let detector;          // Pose detection model
-// let detectorConfig;    // Configuration for the detector
-// let poses;             // Stores detected poses
-// let video;             // Video capture element
-// let skeleton = true;   // Flag to toggle skeleton drawing
-// let reps = 0;          // Punch counter
-// let punching = false;  // Flag to track punch state
-// let lastWristX = null; // Previous wrist X position (for side view detection)
-// let lastPunchTime = 0; // Timestamp of last counted punch
-// const COOLDOWN = 2000; // 2 second cooldown in milliseconds
-
-// // Initialize the pose detector
-// async function init() {
-//   // Use MoveNet thunder model for better accuracy
-//   detectorConfig = { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER };
-//   detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
-//   await getPoses(); // Start pose estimation
-// }
-
-// // Setup function - runs once at start
-// async function setup() {
-//   // Audio feedback for loading
-//   let msg = new SpeechSynthesisUtterance('Loading, please wait...');
-//   window.speechSynthesis.speak(msg);
-  
-//   // Create canvas and video capture
-//   createCanvas(640, 480);
-//   video = createCapture(VIDEO);
-//   video.hide(); // Hide the video element (we'll draw it manually)
-//   await init(); // Initialize pose detector
-// }
-
-// // Continuously estimate poses from video
-// async function getPoses() {
-//   poses = await detector.estimatePoses(video.elt); // Get poses from video element
-//   setTimeout(getPoses, 50); // Update poses frequently (20fps)
-// }
-
-// // Main drawing function
-// function draw() {
-//   background(220); // Clear canvas with light gray
-//   image(video, 0, 0, video.width, video.height); // Draw video feed
-  
-//   // Draw keypoints and skeleton
-//   drawKeypoints();
-//   drawSkeleton();
-  
-//   // Display punch counter
-//   fill(255);
-//   strokeWeight(2);
-//   stroke(51);
-//   textSize(40);
-//   text(`Punches: ${reps}`, 100, 90);
-  
-//   // Display cooldown status
-//   let currentTime = millis();
-//   let cooldownRemaining = COOLDOWN - (currentTime - lastPunchTime);
-//   if (cooldownRemaining > 0) {
-//     textSize(20);
-//     text(`Cooldown: ${(cooldownRemaining/1000).toFixed(1)}s`, 100, 120);
-//   }
-// }
-
-// // Draw detected keypoints (joints)
-// function drawKeypoints() {
-//   if (poses && poses.length > 0) {
-//     // Loop through all keypoints in the first detected pose
-//     for (let kp of poses[0].keypoints) {
-//       if (kp.score > 0.3) { // Only draw if confidence > 30%
-//         fill(255);
-//         stroke(0);
-//         strokeWeight(4);
-//         circle(kp.x, kp.y, 16); // Draw a circle at each keypoint
-//       }
-//     }
-//     detectPunch(); // Check for punches
-//   }
-// }
-
-// // Detect punching motion (side view)
-// function detectPunch() {
-//   // Get relevant body parts (right arm)
-//   let wrist = poses[0].keypoints[10];  // Right wrist (index 10)
-//   let shoulder = poses[0].keypoints[6]; // Right shoulder (index 6)
-//   let elbow = poses[0].keypoints[8];    // Right elbow (index 8)
-
-//   // Only proceed if all keypoints are detected with good confidence
-//   if (wrist.score > 0.3 && shoulder.score > 0.3 && elbow.score > 0.3) {
-//     // Initialize last wrist position if first frame
-//     if (lastWristX === null) {
-//       lastWristX = wrist.x;
-//       return;
-//     }
-    
-//     // Thresholds for punch detection (side view)
-//     const punchThreshold = 30; // Minimum horizontal movement to count as punch
-//     const retractThreshold = 15; // Minimum return movement to reset
-    
-//     // Calculate horizontal movement from shoulder (relative to body)
-//     let currentExtension = wrist.x - shoulder.x;
-//     let previousExtension = lastWristX - shoulder.x;
-    
-//     // Detect punch extension (arm moving forward)
-//     let armExtended = (currentExtension - previousExtension) > punchThreshold;
-//     // Detect retraction (arm moving back)
-//     let armRetracted = Math.abs(currentExtension - previousExtension) < retractThreshold;
-    
-//     // Get current time for cooldown check
-//     let currentTime = millis();
-    
-//     // Count a punch when arm extends forward and cooldown has expired
-//     if (!punching && armExtended && (currentTime - lastPunchTime) > COOLDOWN) {
-//       reps++;
-//       // Update last punch time
-//       lastPunchTime = currentTime;
-//       // Announce count
-//       let msg = new SpeechSynthesisUtterance(reps.toString());
-//       window.speechSynthesis.speak(msg);
-//       punching = true;
-//     }
-    
-//     // Reset punch state when arm retracts
-//     if (punching && armRetracted) {
-//       punching = false;
-//     }
-    
-//     // Update last wrist position
-//     lastWristX = wrist.x;
-//   }
-// }
-
-// // Draw skeleton connections between keypoints
-// function drawSkeleton() {
-//   let confidence_threshold = 0.5; // Only draw if confidence > 50%
-//   if (poses && poses.length > 0) {
-//     // Define connections for right arm (shoulder -> elbow -> wrist)
-//     let edges = [['6', '8'], ['8', '10']];
-    
-//     // Draw each connection
-//     for (const [p1, p2] of edges) {
-//       let kp1 = poses[0].keypoints[parseInt(p1)];
-//       let kp2 = poses[0].keypoints[parseInt(p2)];
-      
-//       // Only draw if both points are confident
-//       if (kp1.score > confidence_threshold && kp2.score > confidence_threshold) {
-//         strokeWeight(3);
-//         stroke(0, 255, 0); // Green lines
-//         line(kp1.x, kp1.y, kp2.x, kp2.y);
-//       }
-//     }
-//   }
-// }
-
-
-
 // Global variables
 let detector;
 let video;
 let poses = [];
 const COOLDOWN = 2000; // 2 second cooldown
+let gameActive = true;
+let winner = null;
 
 // Players configuration
 const players = {
   player1: {
     id: null,
+    health: 100,
     reps: 0,
-    punching: false,
-    lastWristX: null,
-    lastPunchTime: 0,
+    punchingLeft: false,
+    punchingRight: false,
+    lastLeftWristX: null,
+    lastRightWristX: null,
+    lastLeftPunchTime: 0,
+    lastRightPunchTime: 0,
+    leftCooldownRemaining: 0,
+    rightCooldownRemaining: 0,
     color: [255, 50, 50], // Red
     counterId: 'counter1',
-    side: 'left'
+    healthBarId: 'health1',
+    leftCooldownId: 'cooldown1-left',
+    rightCooldownId: 'cooldown1-right',
+    side: 'left',
+    name: 'RED'
   },
   player2: {
     id: null,
+    health: 100,
     reps: 0,
-    punching: false,
-    lastWristX: null,
-    lastPunchTime: 0,
+    punchingLeft: false,
+    punchingRight: false,
+    lastLeftWristX: null,
+    lastRightWristX: null,
+    lastLeftPunchTime: 0,
+    lastRightPunchTime: 0,
+    leftCooldownRemaining: 0,
+    rightCooldownRemaining: 0,
     color: [50, 50, 255], // Blue
     counterId: 'counter2',
-    side: 'right'
+    healthBarId: 'health2',
+    leftCooldownId: 'cooldown2-left',
+    rightCooldownId: 'cooldown2-right',
+    side: 'right',
+    name: 'BLUE'
   }
 };
 
 // Initialize the pose detector
 async function init() {
-  const model = poseDetection.SupportedModels.MoveNet;
-  const detectorConfig = {
-    modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING,
-    enableTracking: true,
-    trackerType: poseDetection.TrackerType.BoundingBox
-  };
-  await tf.setBackend('webgl');
-  detector = await poseDetection.createDetector(model, detectorConfig);
-  await getPoses();
+  try {
+    console.log("Initializing pose detector...");
+    const model = poseDetection.SupportedModels.MoveNet;
+    const detectorConfig = {
+      modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING,
+      enableTracking: true,
+      trackerType: poseDetection.TrackerType.BoundingBox
+    };
+    await tf.setBackend('webgl');
+    detector = await poseDetection.createDetector(model, detectorConfig);
+    console.log("Pose detector initialized successfully");
+    await getPoses();
+  } catch (error) {
+    console.error("Error initializing pose detector:", error);
+  }
 }
 
 // Setup function - runs once at start
 async function setup() {
+  console.log("Setup function started");
+  
   // Create fullscreen canvas
   const canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent('canvas-container');
@@ -466,7 +85,85 @@ async function setup() {
   // Hide address bar on mobile
   window.scrollTo(0, 1);
   
+  // Create health bars and cooldown indicators
+  createGameUI();
+  
+  console.log("About to initialize pose detector");
   await init();
+  console.log("Setup complete");
+}
+
+// Create game UI elements
+function createGameUI() {
+  // Create health bars
+  const gameUI = select('#game-ui');
+  
+  const health1 = createDiv();
+  health1.parent(gameUI);
+  health1.id(players.player1.healthBarId);
+  health1.class('health-bar');
+  health1.style('left', '20px');
+  
+  const health2 = createDiv();
+  health2.parent(gameUI);
+  health2.id(players.player2.healthBarId);
+  health2.class('health-bar');
+  health2.style('right', '20px');
+  
+  // Create health bar contents
+  const health1Fill = createDiv();
+  health1Fill.parent(health1);
+  health1Fill.class('health-fill red-health');
+  
+  const health2Fill = createDiv();
+  health2Fill.parent(health2);
+  health2Fill.class('health-fill blue-health');
+  
+  // Create cooldown indicators for both hands
+  // Player 1 cooldowns
+  const cooldown1Left = createDiv();
+  cooldown1Left.parent(gameUI);
+  cooldown1Left.id(players.player1.leftCooldownId);
+  cooldown1Left.class('cooldown-indicator hidden');
+  cooldown1Left.style('left', '20px');
+  cooldown1Left.style('top', '70px');
+  
+  const cooldown1Right = createDiv();
+  cooldown1Right.parent(gameUI);
+  cooldown1Right.id(players.player1.rightCooldownId);
+  cooldown1Right.class('cooldown-indicator hidden');
+  cooldown1Right.style('left', '20px');
+  cooldown1Right.style('top', '90px');
+  
+  // Player 2 cooldowns
+  const cooldown2Left = createDiv();
+  cooldown2Left.parent(gameUI);
+  cooldown2Left.id(players.player2.leftCooldownId);
+  cooldown2Left.class('cooldown-indicator hidden');
+  cooldown2Left.style('right', '20px');
+  cooldown2Left.style('top', '70px');
+  
+  const cooldown2Right = createDiv();
+  cooldown2Right.parent(gameUI);
+  cooldown2Right.id(players.player2.rightCooldownId);
+  cooldown2Right.class('cooldown-indicator hidden');
+  cooldown2Right.style('right', '20px');
+  cooldown2Right.style('top', '90px');
+  
+  // Game over screen
+  const gameOverScreen = createDiv();
+  gameOverScreen.id('game-over');
+  gameOverScreen.parent(gameUI);
+  gameOverScreen.class('hidden');
+  
+  const winnerText = createDiv();
+  winnerText.id('winner-text');
+  winnerText.parent(gameOverScreen);
+  
+  const restartBtn = createButton('PLAY AGAIN');
+  restartBtn.id('restart-btn');
+  restartBtn.parent(gameOverScreen);
+  restartBtn.mousePressed(restartGame);
 }
 
 // Handle window resize
@@ -477,7 +174,13 @@ function windowResized() {
 
 // Continuously estimate poses from video
 async function getPoses() {
-  poses = await detector.estimatePoses(video.elt, { maxPoses: 2 });
+  if (detector) {
+    try {
+      poses = await detector.estimatePoses(video.elt, { maxPoses: 2 });
+    } catch (error) {
+      console.error("Error detecting poses:", error);
+    }
+  }
   setTimeout(getPoses, 50);
 }
 
@@ -489,22 +192,35 @@ function draw() {
   // Draw video feed centered and scaled
   const videoAspect = video.width / video.height;
   const canvasAspect = width / height;
-  let drawWidth, drawHeight;
+  let drawWidth, drawHeight, drawX, drawY;
   
   if (videoAspect > canvasAspect) {
     drawWidth = width;
     drawHeight = width / videoAspect;
+    drawX = 0;
+    drawY = (height - drawHeight) / 2;
   } else {
     drawHeight = height;
     drawWidth = height * videoAspect;
+    drawX = (width - drawWidth) / 2;
+    drawY = 0;
   }
   
-  image(video, (width - drawWidth)/2, (height - drawHeight)/2, drawWidth, drawHeight);
+  // Draw the video mirrored
+  push();
+  translate(width, 0);
+  scale(-1, 1);
+  image(video, width - drawWidth - drawX, drawY, drawWidth, drawHeight);
+  pop();
   
-  // Process and draw all poses
-  if (poses && poses.length > 0) {
+  // Process and draw all poses if game is active
+  if (gameActive && poses && poses.length > 0) {
     // Assign or update player IDs based on position
     assignPlayerIds();
+    
+    // Scale factor for keypoints to match video display size
+    const scaleX = drawWidth / video.width;
+    const scaleY = drawHeight / video.height;
     
     // Draw keypoints and skeletons for each pose
     for (let i = 0; i < poses.length; i++) {
@@ -512,15 +228,61 @@ function draw() {
       const player = getPlayerByPoseId(pose.id);
       
       if (player) {
-        drawKeypoints(pose, player.color);
-        drawSkeleton(pose, player.color);
-        detectPunch(pose, player);
+        // Create a corrected pose with adjusted coordinates
+        const correctedPose = correctPoseCoordinates(pose, drawX, drawY, scaleX, scaleY, width);
+        
+        // Draw the keypoints and skeleton
+        drawKeypoints(correctedPose, player.color);
+        drawSkeleton(correctedPose, player.color);
+        
+        if (gameActive) {
+          detectPunches(correctedPose, player);
+        }
+        
+        // Draw player name above their head
+        const nose = correctedPose.keypoints[0];
+        if (nose.score > 0.3) {
+          textSize(24);
+          fill(player.color);
+          textAlign(CENTER);
+          text(player.name, nose.x, nose.y - 40);
+        }
       }
     }
   }
   
-  // Update counters
-  updateCounters();
+  // Update cooldown timers
+  updateCooldowns();
+  
+  // Update UI
+  updateHealthBars();
+  
+  // Check for game over
+  checkGameOver();
+  
+  // Debug info
+  if (poses && poses.length > 0) {
+    fill(255);
+    textSize(16);
+    text(`Players detected: ${poses.length}`, 10, height - 20);
+  }
+}
+
+// Correct pose coordinates to match the displayed video
+function correctPoseCoordinates(pose, drawX, drawY, scaleX, scaleY, canvasWidth) {
+  const correctedPose = structuredClone(pose);
+  
+  for (let i = 0; i < correctedPose.keypoints.length; i++) {
+    // Scale the coordinates from the original video size to the displayed size
+    const x = correctedPose.keypoints[i].x * scaleX;
+    const y = correctedPose.keypoints[i].y * scaleY;
+    
+    // Mirror the x-coordinate for proper display
+    correctedPose.keypoints[i].x = canvasWidth - (x + drawX);
+    correctedPose.keypoints[i].y = y + drawY;
+  }
+  
+  return correctedPose;
 }
 
 // Assign players based on horizontal position
@@ -530,7 +292,7 @@ function assignPlayerIds() {
     const pose = poses[0];
     const centerX = pose.keypoints[0].x; // Use nose position
     
-    if (centerX < width/2) {
+    if (centerX > video.width/2) { // Flipped logic due to mirroring
       if (players.player1.id === null || players.player1.id === pose.id) {
         players.player1.id = pose.id;
       }
@@ -540,8 +302,8 @@ function assignPlayerIds() {
       }
     }
   } else if (poses.length === 2) {
-    // Two players - assign leftmost to player1, rightmost to player2
-    poses.sort((a, b) => a.keypoints[0].x - b.keypoints[0].x);
+    // Two players - assign rightmost to player1, leftmost to player2 (after mirroring)
+    poses.sort((a, b) => b.keypoints[0].x - a.keypoints[0].x);
     players.player1.id = poses[0].id;
     players.player2.id = poses[1].id;
   }
@@ -556,12 +318,13 @@ function getPlayerByPoseId(poseId) {
 
 // Draw detected keypoints
 function drawKeypoints(pose, color) {
+  // Keypoints to draw (we'll make them slightly larger)
   for (let kp of pose.keypoints) {
     if (kp.score > 0.3) {
       fill(color);
       stroke(0);
       strokeWeight(4);
-      circle(kp.x, kp.y, 12);
+      circle(kp.x, kp.y, 16); // Increased size for better visibility
     }
   }
 }
@@ -569,10 +332,16 @@ function drawKeypoints(pose, color) {
 // Draw skeleton connections
 function drawSkeleton(pose, color) {
   const edges = [
+    // Torso
+    [5, 6], [5, 11], [6, 12], [11, 12],
     // Right arm
     [6, 8], [8, 10],
     // Left arm
-    [5, 7], [7, 9]
+    [5, 7], [7, 9],
+    // Head
+    [0, 5], [0, 6],
+    // Legs
+    [11, 13], [13, 15], [12, 14], [14, 16]
   ];
   
   for (const [i, j] of edges) {
@@ -581,63 +350,261 @@ function drawSkeleton(pose, color) {
     
     if (kp1.score > 0.3 && kp2.score > 0.3) {
       stroke(color);
-      strokeWeight(4);
+      strokeWeight(6); // Thicker lines for better visibility
       line(kp1.x, kp1.y, kp2.x, kp2.y);
     }
   }
 }
 
-// Detect punching motion for a player
-function detectPunch(pose, player) {
-  const wrist = pose.keypoints[10]; // Right wrist
-  const shoulder = pose.keypoints[6]; // Right shoulder
+// Detect punches for both hands
+function detectPunches(pose, player) {
+  // Get keypoints for both wrists and shoulders
+  const leftWrist = pose.keypoints[9];  // Left wrist
+  const leftShoulder = pose.keypoints[5]; // Left shoulder
+  const rightWrist = pose.keypoints[10]; // Right wrist  
+  const rightShoulder = pose.keypoints[6]; // Right shoulder
   
-  if (wrist.score > 0.3 && shoulder.score > 0.3) {
-    // Initialize last wrist position if first frame
-    if (player.lastWristX === null) {
-      player.lastWristX = wrist.x;
-      return;
-    }
-    
-    // Punch detection thresholds
-    const punchThreshold = width * 0.05; // 5% of screen width
-    const retractThreshold = width * 0.03;
-    
-    // Calculate movement
-    const currentExtension = wrist.x - shoulder.x;
-    const previousExtension = player.lastWristX - shoulder.x;
-    const movement = currentExtension - previousExtension;
-    
-    // Detect punch extension
-    const armExtended = movement > punchThreshold;
-    // Detect retraction
-    const armRetracted = Math.abs(movement) < retractThreshold;
-    
-    // Current time for cooldown
-    const currentTime = millis();
-    
-    // Count punch if extended and cooldown expired
-    if (!player.punching && armExtended && (currentTime - player.lastPunchTime) > COOLDOWN) {
-      player.reps++;
-      player.lastPunchTime = currentTime;
-      punchFeedback(player.counterId);
-      player.punching = true;
-    }
-    
-    // Reset punch state when arm retracts
-    if (player.punching && armRetracted) {
-      player.punching = false;
-    }
-    
-    // Update last wrist position
-    player.lastWristX = wrist.x;
+  // Check if keypoints are detected with good confidence
+  if (leftWrist.score > 0.3 && leftShoulder.score > 0.3) {
+    // For left player, left hand punches toward center (increasing X)
+    // For right player, left hand punches toward center (decreasing X)
+    const punchDirection = player.side === 'left' ? 1 : -1;
+    detectSinglePunch(leftWrist, leftShoulder, player, 'left', punchDirection);
+  }
+  
+  if (rightWrist.score > 0.3 && rightShoulder.score > 0.3) {
+    // For left player, right hand punches toward center (increasing X)
+    // For right player, right hand punches toward center (decreasing X)
+    const punchDirection = player.side === 'left' ? 1 : -1;
+    detectSinglePunch(rightWrist, rightShoulder, player, 'right', punchDirection);
   }
 }
 
-// Update counter displays
-function updateCounters() {
-  select('#counter1').html(`RED: ${players.player1.reps}`);
-  select('#counter2').html(`BLUE: ${players.player2.reps}`);
+// Detect a single punch
+function detectSinglePunch(wrist, shoulder, player, hand, punchDirection) {
+  // Initialize last wrist position if first frame
+  if (hand === 'left' && player.lastLeftWristX === null) {
+    player.lastLeftWristX = wrist.x;
+    return;
+  } else if (hand === 'right' && player.lastRightWristX === null) {
+    player.lastRightWristX = wrist.x;
+    return;
+  }
+  
+  // Get the last position based on which hand
+  const lastWristX = hand === 'left' ? player.lastLeftWristX : player.lastRightWristX;
+  
+  // Punch detection thresholds
+  const punchThreshold = width * 0.03; // 3% of screen width (reduced threshold)
+  const retractThreshold = width * 0.02;
+  
+  // Calculate movement direction 
+  // If punchDirection is 1, increasing X is a punch
+  // If punchDirection is -1, decreasing X is a punch
+  const rawMovement = wrist.x - lastWristX;
+  const movement = rawMovement * punchDirection;
+  
+  // Calculate punch strength based on speed
+  const punchStrength = map(abs(movement), punchThreshold, punchThreshold * 2, 5, 15, true);
+  
+  // Current time for cooldown
+  const currentTime = millis();
+  
+  // Get appropriate timing variables based on which hand
+  const isPunching = hand === 'left' ? player.punchingLeft : player.punchingRight;
+  const lastPunchTime = hand === 'left' ? player.lastLeftPunchTime : player.lastRightPunchTime;
+  
+  // Detect punch extension
+  const armExtended = movement > punchThreshold;
+  // Detect retraction
+  const armRetracted = abs(movement) < retractThreshold;
+  
+  // Count punch if extended and cooldown expired
+  if (!isPunching && armExtended && (currentTime - lastPunchTime) > COOLDOWN) {
+    player.reps++;
+    
+    // Update appropriate timing variables
+    if (hand === 'left') {
+      player.lastLeftPunchTime = currentTime;
+      player.leftCooldownRemaining = COOLDOWN;
+      player.punchingLeft = true;
+    } else {
+      player.lastRightPunchTime = currentTime;
+      player.rightCooldownRemaining = COOLDOWN;
+      player.punchingRight = true;
+    }
+    
+    // Show cooldown indicator
+    const cooldownId = hand === 'left' ? player.leftCooldownId : player.rightCooldownId;
+    showCooldown(cooldownId);
+    
+    // Visual feedback
+    punchFeedback(player.counterId);
+    
+    // Damage opponent
+    const opponent = player === players.player1 ? players.player2 : players.player1;
+    opponent.health = max(0, opponent.health - punchStrength);
+  }
+  
+  // Reset punch state when arm retracts
+  if (isPunching && armRetracted) {
+    if (hand === 'left') {
+      player.punchingLeft = false;
+    } else {
+      player.punchingRight = false;
+    }
+  }
+  
+  // Update last wrist position
+  if (hand === 'left') {
+    player.lastLeftWristX = wrist.x;
+  } else {
+    player.lastRightWristX = wrist.x;
+  }
+}
+
+// Show cooldown indicator
+function showCooldown(cooldownId) {
+  const cooldownEl = select(`#${cooldownId}`);
+  cooldownEl.removeClass('hidden');
+}
+
+// Update cooldown timers
+function updateCooldowns() {
+  const currentTime = millis();
+  
+  // Update player1 left hand cooldown
+  if (players.player1.leftCooldownRemaining > 0) {
+    const elapsed = currentTime - players.player1.lastLeftPunchTime;
+    players.player1.leftCooldownRemaining = max(0, COOLDOWN - elapsed);
+    const percent = (players.player1.leftCooldownRemaining / COOLDOWN) * 100;
+    
+    const cooldownEl = select(`#${players.player1.leftCooldownId}`);
+    cooldownEl.style('width', `${percent}%`);
+    
+    if (players.player1.leftCooldownRemaining === 0) {
+      cooldownEl.addClass('hidden');
+    }
+  }
+  
+  // Update player1 right hand cooldown
+  if (players.player1.rightCooldownRemaining > 0) {
+    const elapsed = currentTime - players.player1.lastRightPunchTime;
+    players.player1.rightCooldownRemaining = max(0, COOLDOWN - elapsed);
+    const percent = (players.player1.rightCooldownRemaining / COOLDOWN) * 100;
+    
+    const cooldownEl = select(`#${players.player1.rightCooldownId}`);
+    cooldownEl.style('width', `${percent}%`);
+    
+    if (players.player1.rightCooldownRemaining === 0) {
+      cooldownEl.addClass('hidden');
+    }
+  }
+  
+  // Update player2 left hand cooldown
+  if (players.player2.leftCooldownRemaining > 0) {
+    const elapsed = currentTime - players.player2.lastLeftPunchTime;
+    players.player2.leftCooldownRemaining = max(0, COOLDOWN - elapsed);
+    const percent = (players.player2.leftCooldownRemaining / COOLDOWN) * 100;
+    
+    const cooldownEl = select(`#${players.player2.leftCooldownId}`);
+    cooldownEl.style('width', `${percent}%`);
+    
+    if (players.player2.leftCooldownRemaining === 0) {
+      cooldownEl.addClass('hidden');
+    }
+  }
+  
+  // Update player2 right hand cooldown
+  if (players.player2.rightCooldownRemaining > 0) {
+    const elapsed = currentTime - players.player2.lastRightPunchTime;
+    players.player2.rightCooldownRemaining = max(0, COOLDOWN - elapsed);
+    const percent = (players.player2.rightCooldownRemaining / COOLDOWN) * 100;
+    
+    const cooldownEl = select(`#${players.player2.rightCooldownId}`);
+    cooldownEl.style('width', `${percent}%`);
+    
+    if (players.player2.rightCooldownRemaining === 0) {
+      cooldownEl.addClass('hidden');
+    }
+  }
+}
+
+// Update health bars
+function updateHealthBars() {
+  // Update player 1 health bar
+  const health1 = select(`#${players.player1.healthBarId} .health-fill`);
+  health1.style('width', `${players.player1.health}%`);
+  
+  // Update player 2 health bar
+  const health2 = select(`#${players.player2.healthBarId} .health-fill`);
+  health2.style('width', `${players.player2.health}%`);
+  
+  // Update counters
+  select('#counter1').html(`${players.player1.name}: ${players.player1.reps}`);
+  select('#counter2').html(`${players.player2.name}: ${players.player2.reps}`);
+}
+
+// Check for game over
+function checkGameOver() {
+  if (!gameActive) return;
+  
+  if (players.player1.health <= 0) {
+    gameOver(players.player2);
+  } else if (players.player2.health <= 0) {
+    gameOver(players.player1);
+  }
+}
+
+// Game over function
+function gameOver(winner) {
+  gameActive = false;
+  this.winner = winner;
+  
+  // Show game over screen
+  const gameOverScreen = select('#game-over');
+  gameOverScreen.removeClass('hidden');
+  
+  // Show winner
+  select('#winner-text').html(`${winner.name} WINS!`);
+}
+
+// Restart game
+function restartGame() {
+  // Reset player stats
+  players.player1.health = 100;
+  players.player1.reps = 0;
+  players.player1.punchingLeft = false;
+  players.player1.punchingRight = false;
+  players.player1.lastLeftPunchTime = 0;
+  players.player1.lastRightPunchTime = 0;
+  players.player1.leftCooldownRemaining = 0;
+  players.player1.rightCooldownRemaining = 0;
+  
+  players.player2.health = 100;
+  players.player2.reps = 0;
+  players.player2.punchingLeft = false;
+  players.player2.punchingRight = false;
+  players.player2.lastLeftPunchTime = 0;
+  players.player2.lastRightPunchTime = 0;
+  players.player2.leftCooldownRemaining = 0;
+  players.player2.rightCooldownRemaining = 0;
+  
+  // Hide game over screen
+  select('#game-over').addClass('hidden');
+  
+  // Hide cooldown indicators
+  select(`#${players.player1.leftCooldownId}`).addClass('hidden');
+  select(`#${players.player1.rightCooldownId}`).addClass('hidden');
+  select(`#${players.player2.leftCooldownId}`).addClass('hidden');
+  select(`#${players.player2.rightCooldownId}`).addClass('hidden');
+  
+  // Update UI
+  updateHealthBars();
+  
+  // Activate game
+  gameActive = true;
+  winner = null;
 }
 
 // Visual feedback for punch
@@ -645,9 +612,4 @@ function punchFeedback(counterId) {
   const counter = select(`#${counterId}`);
   counter.addClass('flash');
   setTimeout(() => counter.removeClass('flash'), 300);
-  
-  // Play punch sound if available
-  if (typeof punchSound !== 'undefined') {
-    punchSound.play();
-  }
 }
